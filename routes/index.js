@@ -23,6 +23,8 @@ router.post(
 
 router.get("/stores/:id/edit", catchErrors(storeController.editStore));
 router.get("/store/:slug", catchErrors(storeController.getStoreBySlug));
+router.get("/tags", catchErrors(storeController.getStoresByTags));
+router.get("/tags/:tag", catchErrors(storeController.getStoresByTags));
 // router.get("/", (req, res) => {
 //   // const ter = { name: "terezicka", age: "NA", cool: true };
 //   // res.json(ter);
