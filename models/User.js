@@ -20,11 +20,12 @@ const userSchema = new Schema({
     required: "Please supply a name",
     trim: true,
   },
+  resetPasswordToken: String,
+  resetPasswordExpires: Date,
 });
 
 userSchema.virtual("gravatar").get(function () {
   const hash = md5(this.email);
-  console.log(hash);
   return `https://gravatar.com/avatar/${hash}?s=200`;
 });
 
