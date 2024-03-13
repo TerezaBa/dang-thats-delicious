@@ -53,6 +53,9 @@ router.post(
   authController.confirmedPasswords,
   catchErrors(authController.update)
 );
+
+// API
+router.get("/api/search", catchErrors(storeController.searchStores));
 // router.get("/", (req, res) => {
 //   // const ter = { name: "terezicka", age: "NA", cool: true };
 //   // res.json(ter);

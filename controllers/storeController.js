@@ -86,6 +86,7 @@ exports.updateStore = async (req, res) => {
   // set the location data to be a point
   req.body.location.type = "Point";
   // find and update the store
+
   const store = await Store.findOneAndUpdate({ _id: req.params.id }, req.body, {
     new: true, // return the new store instead of the old one
     runValidators: true, // runs validators also on update, not only on first save
@@ -119,4 +120,26 @@ exports.getStoresByTags = async (req, res) => {
   const [tags, stores] = await Promise.all([tagsPromise, storesPromise]);
 
   res.render("tag", { title: "Tags", tags, tag, stores });
+};
+
+exports.searchStores = async (req, res) => {
+  const stores = await Store
+    // first find stores that match
+    .find(
+      {
+        $text: {
+          $search: req.query.q,
+        },
+      },
+      {
+        score: { $meta: "textScore" },
+      }
+    )
+    // then sort them
+    .sort({
+      score: { $meta: "textScore" },
+    })
+    // limit to only 5 stores
+    .limit(5);
+  res.json(stores);
 };
