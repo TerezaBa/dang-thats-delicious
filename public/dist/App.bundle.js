@@ -2206,6 +2206,83 @@ NodeList.prototype.on = NodeList.prototype.addEventListener = function (name, fn
 
 /***/ }),
 
+/***/ "./public/javascripts/modules/map.js":
+/*!*******************************************!*\
+  !*** ./public/javascripts/modules/map.js ***!
+  \*******************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _bling__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./bling */ "./public/javascripts/modules/bling.js");
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+
+
+var mapOptions = {
+  center: {
+    lat: 43.2,
+    lng: -79.8
+  },
+  zoom: 8
+}; // TODO geolocation nav current or whatever - get it
+
+function loadPlaces(map) {
+  var lat = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 43.2;
+  var lng = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : -79.8;
+  axios__WEBPACK_IMPORTED_MODULE_0___default().get("/api/stores/near?lat=".concat(lat, "&lng=").concat(lng)).then(function (res) {
+    var places = res.data;
+
+    if (!places.length) {
+      alert("No places found!");
+      return;
+    }
+
+    var markers = places.map(function (place) {
+      var _place$location$coord = _slicedToArray(place.location.coordinates, 2),
+          placeLng = _place$location$coord[0],
+          placeLat = _place$location$coord[1];
+
+      var position = {
+        lat: placeLat,
+        lng: placeLng
+      };
+      var marker = new google.maps.Marker({
+        map: map,
+        position: position
+      });
+      marker.place = place;
+      return marker;
+    });
+    console.log(markers);
+  });
+}
+
+function makeMap(mapDiv) {
+  if (!mapDiv) return; // make map
+
+  var map = new google.maps.Map(mapDiv, mapOptions);
+  loadPlaces(map);
+  var input = (0,_bling__WEBPACK_IMPORTED_MODULE_1__.$)("[name='geolocate']");
+  var autocomplete = new google.maps.places.Autocomplete(input);
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (makeMap);
+
+/***/ }),
+
 /***/ "./public/javascripts/modules/typeAhead.js":
 /*!*************************************************!*\
   !*** ./public/javascripts/modules/typeAhead.js ***!
@@ -3791,12 +3868,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _modules_bling__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./modules/bling */ "./public/javascripts/modules/bling.js");
 /* harmony import */ var _modules_autocomplete__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./modules/autocomplete */ "./public/javascripts/modules/autocomplete.js");
 /* harmony import */ var _modules_typeAhead__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./modules/typeAhead */ "./public/javascripts/modules/typeAhead.js");
+/* harmony import */ var _modules_map__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./modules/map */ "./public/javascripts/modules/map.js");
+
 
 
 
 
 (0,_modules_autocomplete__WEBPACK_IMPORTED_MODULE_2__["default"])((0,_modules_bling__WEBPACK_IMPORTED_MODULE_1__.$)("#address"), (0,_modules_bling__WEBPACK_IMPORTED_MODULE_1__.$)("#lat"), (0,_modules_bling__WEBPACK_IMPORTED_MODULE_1__.$)("#lng"));
 (0,_modules_typeAhead__WEBPACK_IMPORTED_MODULE_3__["default"])((0,_modules_bling__WEBPACK_IMPORTED_MODULE_1__.$)(".search"));
+(0,_modules_map__WEBPACK_IMPORTED_MODULE_4__["default"])((0,_modules_bling__WEBPACK_IMPORTED_MODULE_1__.$)("#map"));
 }();
 /******/ })()
 ;
