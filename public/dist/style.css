@@ -999,7 +999,7 @@ label {
   outline: 0;
   position: relative; }
   .heart__button:after {
-    content: '♥️';
+    content: "♥️";
     font-size: 20px;
     position: absolute;
     opacity: 0;

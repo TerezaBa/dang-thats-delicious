@@ -2160,7 +2160,6 @@ function autocomplete(input, latInput, lngInput) {
   var dropdown = new google.maps.places.Autocomplete(input);
   dropdown.addListener("place_changed", function () {
     var place = dropdown.getPlace();
-    console.log(place);
     latInput.value = place.geometry.location.lat();
     lngInput.value = place.geometry.location.lng();
   }); //if someone hits enter on address field, dont submit form
@@ -2206,6 +2205,45 @@ NodeList.prototype.on = NodeList.prototype.addEventListener = function (name, fn
 
 /***/ }),
 
+/***/ "./public/javascripts/modules/heart.js":
+/*!*********************************************!*\
+  !*** ./public/javascripts/modules/heart.js ***!
+  \*********************************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _bling__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./bling */ "./public/javascripts/modules/bling.js");
+
+
+
+function ajaxHeart(e) {
+  var _this = this;
+
+  e.preventDefault();
+  console.log("<3");
+  axios__WEBPACK_IMPORTED_MODULE_0___default().post(this.action).then(function (res) {
+    var isHearted = _this.heart.classList.toggle("heart__button--hearted"); // heart is name of button
+
+
+    (0,_bling__WEBPACK_IMPORTED_MODULE_1__.$)(".heart-count").textContent = res.data.hearts.length; //   if (isHearted) {
+    //     this.heart.classList.add("heart__button--float");
+    //     setTimeout(
+    //       () => this.heart.classList.remove("heart__button--float"),
+    //       2500
+    //     );
+    //   }
+  }).catch(function (err) {
+    console.error(err);
+  });
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (ajaxHeart);
+
+/***/ }),
+
 /***/ "./public/javascripts/modules/map.js":
 /*!*******************************************!*\
   !*** ./public/javascripts/modules/map.js ***!
@@ -2248,8 +2286,11 @@ function loadPlaces(map) {
     if (!places.length) {
       alert("No places found!");
       return;
-    }
+    } // create bounds
 
+
+    var bounds = new google.maps.LatLngBounds();
+    var infoWindow = new google.maps.InfoWindow();
     var markers = places.map(function (place) {
       var _place$location$coord = _slicedToArray(place.location.coordinates, 2),
           placeLng = _place$location$coord[0],
@@ -2259,14 +2300,27 @@ function loadPlaces(map) {
         lat: placeLat,
         lng: placeLng
       };
+      bounds.extend(position);
       var marker = new google.maps.Marker({
         map: map,
         position: position
       });
       marker.place = place;
       return marker;
-    });
-    console.log(markers);
+    }); // when marker is clicked, show details of place
+
+    markers.forEach(function (marker) {
+      return marker.addListener("click", function () {
+        var html = "\n          <div class=\"popup\">\n            <a href=\"/store/".concat(this.place.slug, "\">\n              <img src=\"/uploads/").concat(this.place.photo || "store.png", "\" alt=\"").concat(this.place.name, "\" />\n              <p>").concat(this.place.name, " - ").concat(this.place.location.address, "</p>\n              </a>\n          </div>");
+        infoWindow.setContent(html);
+        infoWindow.open(map, this);
+      });
+    }); // zoom map to fit all markers perfectly
+
+    map.setCenter(bounds.getCenter());
+    map.fitBounds(bounds);
+  }).catch(function (err) {
+    console.error(err);
   });
 }
 
@@ -2277,6 +2331,10 @@ function makeMap(mapDiv) {
   loadPlaces(map);
   var input = (0,_bling__WEBPACK_IMPORTED_MODULE_1__.$)("[name='geolocate']");
   var autocomplete = new google.maps.places.Autocomplete(input);
+  autocomplete.addListener("place_changed", function () {
+    var place = autocomplete.getPlace();
+    loadPlaces(map, place.geometry.location.lat(), place.geometry.location.lng());
+  });
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (makeMap);
@@ -3869,6 +3927,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _modules_autocomplete__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./modules/autocomplete */ "./public/javascripts/modules/autocomplete.js");
 /* harmony import */ var _modules_typeAhead__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./modules/typeAhead */ "./public/javascripts/modules/typeAhead.js");
 /* harmony import */ var _modules_map__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./modules/map */ "./public/javascripts/modules/map.js");
+/* harmony import */ var _modules_heart__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./modules/heart */ "./public/javascripts/modules/heart.js");
+
 
 
 
@@ -3877,6 +3937,8 @@ __webpack_require__.r(__webpack_exports__);
 (0,_modules_autocomplete__WEBPACK_IMPORTED_MODULE_2__["default"])((0,_modules_bling__WEBPACK_IMPORTED_MODULE_1__.$)("#address"), (0,_modules_bling__WEBPACK_IMPORTED_MODULE_1__.$)("#lat"), (0,_modules_bling__WEBPACK_IMPORTED_MODULE_1__.$)("#lng"));
 (0,_modules_typeAhead__WEBPACK_IMPORTED_MODULE_3__["default"])((0,_modules_bling__WEBPACK_IMPORTED_MODULE_1__.$)(".search"));
 (0,_modules_map__WEBPACK_IMPORTED_MODULE_4__["default"])((0,_modules_bling__WEBPACK_IMPORTED_MODULE_1__.$)("#map"));
+var heartForms = (0,_modules_bling__WEBPACK_IMPORTED_MODULE_1__.$$)("form.heart");
+heartForms.on("submit", _modules_heart__WEBPACK_IMPORTED_MODULE_5__["default"]);
 }();
 /******/ })()
 ;
