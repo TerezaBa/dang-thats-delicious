@@ -83,11 +83,43 @@ storeSchema.statics.getTagsList = function () {
   ]);
 };
 
+storeSchema.statics.getTopStores = function () {
+  // returns a promise awaited in storeController
+  return this.aggregate([
+    // look up stores and populate their reviews
+    {
+      $lookup: {
+        from: "reviews", // mongodb makes reviews from Review model (adds s and small r)
+        localField: "_id",
+        foreignField: "store",
+        as: "reviews", // name of created field
+      },
+    },
+    // filter for only items that have 2 or more reviews
+    { $match: { "reviews.1": { $exists: true } } },
+    // add average reviews field
+    { $addFields: { averageRating: { $avg: "$reviews.rating" } } },
+    // sort it by our new field, highest reviews first
+    { $sort: { averageRating: -1 } },
+    // limit to at most 10
+    { $limit: 10 },
+  ]);
+};
+
 // find reviews where stores _id property === reviews store property
 storeSchema.virtual("reviews", {
   ref: "Review", // what model to link
   localField: "_id", // which field on the store
   foreignField: "store", // which field on the review
 });
+
+function autopopulate(next) {
+  this.populate("reviews");
+  next();
+}
+
+// why I query a store, the schema will populate with reviews
+storeSchema.pre("find", autopopulate);
+storeSchema.pre("findOne", autopopulate);
 
 module.exports = mongoose.model("Store", storeSchema);
