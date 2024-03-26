@@ -1,2 +1,8 @@
 variables.env
+variables.env.now
 .txt
+node_modules/
+*.log
+.idea
+haters/
+dist/
